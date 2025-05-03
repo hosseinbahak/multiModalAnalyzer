@@ -4,6 +4,7 @@ Main entry point for the multimodal analysis backend.
 """
 from typing import Optional
 import json
+import os  # Added missing import
 from backend.workflow import setup_workflow
 from backend.tools.registry import get_tools_list
 from backend.utils.helpers import ToolState

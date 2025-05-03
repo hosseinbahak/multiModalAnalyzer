@@ -4,17 +4,16 @@ Flask application for the multimodal analysis frontend.
 import os
 import uuid
 import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # Add project root to path
-from backend.main import process_question
-from flask import Flask, render_template, request, jsonify, session
-from werkzeug.utils import secure_filename
 
-# Add parent directory to path
+# Add parent directory to path more safely
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, parent_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 # Import the backend processing function
 from backend.main import process_question
+from flask import Flask, render_template, request, jsonify, session
+from werkzeug.utils import secure_filename
 
 # Initialize Flask app
 app = Flask(__name__)
