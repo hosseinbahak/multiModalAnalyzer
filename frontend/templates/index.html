@@ -1,0 +1,83 @@
+<!-- frontend/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimodal Analysis System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1><i class="fas fa-brain"></i> Multimodal Analysis</h1>
+            <p>Analyze images, PDFs, and ask questions using AI</p>
+        </div>
+    </header>
+    
+    <main>
+        <div class="chat-container">
+            <div class="chat-history" id="chat-history">
+                <div class="message system">
+                    <div class="message-content">
+                        <p>Hello! I'm your Multimodal Analysis Assistant. I can help you analyze images and PDF documents. 
+                           Upload a file and ask me a question to get started.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <form id="query-form" enctype="multipart/form-data">
+                    <div class="file-inputs">
+                        <div class="file-input">
+                            <label for="image-upload">
+                                <i class="fas fa-image"></i>
+                                <span>Image</span>
+                            </label>
+                            <input type="file" id="image-upload" name="image" accept="image/*">
+                            <span class="file-name" id="image-name"></span>
+                        </div>
+                        
+                        <div class="file-input">
+                            <label for="pdf-upload">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>PDF</span>
+                            </label>
+                            <input type="file" id="pdf-upload" name="pdf" accept="application/pdf">
+                            <span class="file-name" id="pdf-name"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="query-input">
+                        <textarea id="query-text" name="query" placeholder="Ask a question about your files..." required></textarea>
+                        <button type="submit" id="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <div class="actions">
+                <button id="clear-btn" class="action-btn">
+                    <i class="fas fa-trash"></i> Clear Conversation
+                </button>
+                <div class="file-preview" id="file-preview">
+                    <h3>File Preview</h3>
+                    <div id="preview-content">
+                        <p>No files uploaded</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 Multimodal Analysis System</p>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
