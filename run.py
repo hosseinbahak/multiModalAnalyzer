@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """
 Main application entry point for the Multimodal Analysis System.
-This script runs both the frontend Flask application.
+This script runs the frontend Flask application.
 """
 import os
 import sys
 import argparse
+
+# Add the current directory to the Python path to ensure local imports work correctly
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
+# Now import the app from the local frontend package
 from frontend.app import app as flask_app
 
 def main():

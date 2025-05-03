@@ -7,6 +7,8 @@ import json
 from backend.workflow import setup_workflow
 from backend.tools.registry import get_tools_list
 from backend.utils.helpers import ToolState
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # Add project root to path
 
 # Initialize the workflow
 workflow = setup_workflow()
