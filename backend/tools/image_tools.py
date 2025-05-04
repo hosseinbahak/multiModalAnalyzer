@@ -18,7 +18,7 @@ def analyze_image(file_path: str, instruction: str = "Please describe this image
     """
     try:
         result = ollama.generate(
-            model='llava:13b',
+            model='llava:34b',
             prompt=instruction,
             images=[file_path],
             stream=False

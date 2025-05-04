@@ -29,19 +29,40 @@ def ToolExecutor(state: ToolState) -> ToolState:
     if not state["tool_exec"]:
         raise ValueError("No tool_exec data available to execute.")
     
-    choice = json.loads(state["tool_exec"])
-    tool_name = choice["function"]
-    args = choice["args"]
-    
-    if tool_name not in tool_registry:
-        raise ValueError(f"Tool {tool_name} not found in registry.")
-    
-    result = tool_registry[tool_name](*args)
-    state["history"] += f"\nExecuted {tool_name} with result: {result}"
-    state["history"] = state["history"][-8000:] if len(state["history"]) > 8000 else state["history"]
-    state["use_tool"] = False
-    state["tool_exec"] = ""
-    return state
+    try:
+        choice = json.loads(state["tool_exec"])
+        
+        if not isinstance(choice, dict) or "function" not in choice:
+            state["history"] += "\nError: Invalid tool execution format."
+            state["use_tool"] = False
+            state["tool_exec"] = ""
+            return state
+            
+        tool_name = choice["function"]
+        args = choice.get("args", [])
+        
+        if tool_name not in tool_registry:
+            state["history"] += f"\nError: Tool {tool_name} not found in registry."
+            state["use_tool"] = False
+            state["tool_exec"] = ""
+            return state
+        
+        result = tool_registry[tool_name](*args)
+        state["history"] += f"\nExecuted {tool_name} with result: {result}"
+        state["history"] = state["history"][-8000:] if len(state["history"]) > 8000 else state["history"]
+        state["use_tool"] = False
+        state["tool_exec"] = ""
+        return state
+    except json.JSONDecodeError:
+        state["history"] += "\nError: Invalid JSON format in tool_exec."
+        state["use_tool"] = False
+        state["tool_exec"] = ""
+        return state
+    except Exception as e:
+        state["history"] += f"\nError executing tool: {str(e)}"
+        state["use_tool"] = False
+        state["tool_exec"] = ""
+        return state
 
 # Define the image_agent function
 def image_agent(state: ToolState) -> ToolState:
@@ -124,13 +145,20 @@ def setup_workflow():
         Returns:
             The type of agent to use next
         """
-        history = state.get("history", "").lower()
-        if ".pdf" in history:
-            return "pdf"
-        elif any(word in history for word in ["analyze image", "describe image"]):
-            return "image"
-        elif state.get("use_tool"):
+        if state.get("use_tool"):
             return "tool"
+            
+        # Check for file paths and keywords in the query
+        history = state.get("history", "").lower()
+        
+        # First priority: Check if PDF file is uploaded and mentioned
+        if state.get("pdf_path") and (".pdf" in history or "pdf" in history or "document" in history):
+            return "pdf"
+            
+        # Second priority: Check if image is uploaded and mentioned
+        if state.get("image_path") and any(word in history for word in ["image", "picture", "photo", "analyze", "describe"]):
+            return "image"
+            
         return "none"
 
     workflow.add_conditional_edges(

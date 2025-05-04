@@ -4,6 +4,7 @@ Flask application for the multimodal analysis frontend.
 import os
 import sys
 import uuid
+import json
 
 # Add parent directory to path more safely
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -55,6 +56,54 @@ def index():
     
     return render_template('index.html')
 
+def extract_final_response(history):
+    """
+    Extract the final response from the history, handling JSON objects properly.
+    
+    Args:
+        history: The full conversation history
+        
+    Returns:
+        The processed final response
+    """
+    if not history:
+        return 'No response available'
+    
+    # Split history into lines and find the last meaningful content
+    lines = history.split('\n')
+    
+    # Go through lines in reverse to find the last non-JSON or processed result
+    for line in reversed(lines):
+        line = line.strip()
+        if line and line.startswith('Executed'):
+            # Found an execution result
+            parts = line.split('with result: ')
+            if len(parts) > 1:
+                return parts[1]
+        
+        # Try to detect if it's a JSON output from an agent
+        if line.startswith('{') and line.endswith('}'):
+            try:
+                # Parse the JSON
+                data = json.loads(line)
+                # If it's an agent response with a scenario field, return that
+                if 'scenario' in data:
+                    return data['scenario']
+                # If it has a function field, this is a tool execution record
+                elif 'function' in data:
+                    continue
+            except json.JSONDecodeError:
+                # Not valid JSON, might be legitimate text response
+                pass
+    
+    # If no specific response format was found, return the last line
+    for line in reversed(lines):
+        if line.strip() and not line.strip().startswith('{'):
+            return line.strip()
+            
+    # Fallback
+    return lines[-1] if lines else 'No response available'
+
 @app.route('/process', methods=['POST'])
 def process():
     """
@@ -95,8 +144,8 @@ def process():
     # Process the query
     result = process_question(query, image_path, pdf_path)
     
-    # Extract just the response part for the frontend
-    response = result.get('history', '').split('\n')[-1] if result else 'Error processing request'
+    # Extract a meaningful response using our helper function
+    response = extract_final_response(result.get('history', '')) if result else 'Error processing request'
     
     return jsonify({
         'response': response,
