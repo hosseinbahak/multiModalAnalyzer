@@ -5,12 +5,12 @@ from typing import Literal
 import json
 from langgraph.graph import StateGraph, END
 
-from .utils.helpers import ToolState
-from .agent.chat_agent import ChatAgent
-from .agent.tool_agent import ToolAgent
-from .agent.image_agent import ImageAnalysisAgent
-from .agent.pdf_agent import PDFAnalysisAgent
-from .tools.registry import tool_registry
+from backend.utils.helpers import ToolState
+from backend.agent.chat_agent import ChatAgent
+from backend.agent.tool_agent import ToolAgent
+from backend.agent.image_agent import ImageAnalysisAgent
+from backend.agent.pdf_agent import PDFAnalysisAgent
+from backend.tools.registry import tool_registry
 
 # Define the function for executing tools based on agent output
 def ToolExecutor(state: ToolState) -> ToolState:

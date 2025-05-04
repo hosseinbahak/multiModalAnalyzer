@@ -2,8 +2,8 @@
 Flask application for the multimodal analysis frontend.
 """
 import os
-import uuid
 import sys
+import uuid
 
 # Add parent directory to path more safely
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
